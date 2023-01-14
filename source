@@ -43,6 +43,7 @@ local function load_Up()
         end
     end)
 end
+Player_Tab:CreateSection("Health")
 local godmode = false
 Player_Tab:CreateToggle({
     Name = "Godmode [Testing]",
@@ -61,6 +62,8 @@ game:GetService("RunService").Heartbeat:Connect(function()
     end
 end)
 
+
+Player_Tab:CreateSection("Other")
 Player_Tab:CreateToggle({
     Name = "Speed changer (CFrame)",
     Callback = function()
@@ -153,7 +156,98 @@ Weapons_Tab:CreateSlider({
         killauraDistant = num
     end
 })
-Weapons_Tab:CreateSection("Buy weapon")
+Weapons_Tab:CreateSection("Buy Loot")
+
+Weapons_Tab:CreateButton({
+    Name = "Buy Knife (melee) (50)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Knife")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy Light vest (Protection) (100)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Light Vest")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy Lockpick (N/A) (100)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Lockpick")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy C4 (Explosive) (500)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","C4")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy M1911 (Pistol) (200)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","M1911")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy Glock (Pistol) (300)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Glock")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy Mossberg (Shotgun) (1,200)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Mossberg")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy Uzi (smg) (900)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Uzi")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy AK-47 (assault-rifle) (3000)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","AK-47")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy AR-15 (assault-rifle) (2700)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","AR-15")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy RPG (explosive) (10,000)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","RPG")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy smoke (grenade) (100)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Smoke")
+    end
+})
+
+Weapons_Tab:CreateButton({
+    Name = "Buy frag (grenade) (200)",
+    Callback = function()
+        FireRemoteEvent.FireServer("attemptPurchase","Frag")
+    end
+})
 
 local ClickToUnlock = false
 local ClickToUnlock = false
