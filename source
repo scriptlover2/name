@@ -1,3 +1,4 @@
+
 local GuiLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 local folder = Instance.new("Folder",game.ReplicatedStorage)
 folder.Name = "OhioObjects"
@@ -88,7 +89,9 @@ Player_Tab:CreateSlider{
 local oldposbuyweapon = nil
 local KillAuraDamage = false
 local KillAuraInstant = false
-local killauraDistant = 15
+local StompAura = false
+local killauraDistant = 5
+local StomptAuraDistant = 5
 Weapons_Tab:CreateSection("Kill aura")
 Weapons_Tab:CreateToggle({
     Name = "Kill aura Instant (Equip fist)",
@@ -111,6 +114,35 @@ Weapons_Tab:CreateToggle({
         end
     end
 })
+
+Weapons_Tab:CreateToggle({
+    Name = "Stomp aura",
+    Callback = function()
+        if StompAura == false then
+            StompAura = true
+        else
+            StompAura = false
+        end
+    end
+})
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if StompAura == true then
+        for i,v in pairs(game.Players:GetChildren()) do
+            if v ~= game.Players.LocalPlayer then
+                if v.Character then
+                    if v.Character:FindFirstChild("HumanoidRootPart") then
+                        if (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < StomptAuraDistant then
+                            FireRemoteEvent.FireServer("stompPlayer",v)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+
 
 
 
@@ -151,9 +183,20 @@ Weapons_Tab:CreateSlider({
     Range = {2, 15},
     Increment = 1,
     Suffix = "Distance",
-    CurrentValue = 15,
+    CurrentValue = 5,
     Callback = function(num)
         killauraDistant = num
+    end
+})
+
+Weapons_Tab:CreateSlider({
+    Name = "Stomp aura distance (studs)",
+    Range = {2, 15},
+    Increment = 1,
+    Suffix = "Distance",
+    CurrentValue = 5,
+    Callback = function(num)
+        StomptAuraDistant = num
     end
 })
 Weapons_Tab:CreateSection("Buy Loot")
