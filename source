@@ -16,10 +16,10 @@ local locations = {
     mossberg_loc = CFrame.new(681.468872, 6.2388587, -704.764771, 0.893163681, 0.000150624022, -0.449731767, 8.98900107e-05, 0.999999881, 0.000513440464, 0.449731767, -0.000499012764, 0.893163502),
     uzi_loc = CFrame.new(685.587463, 6.24341631, -693.095398, 0.588538647, 6.6678183e-09, -0.808469057, -2.41036915e-08, 1, -9.2992245e-09, 0.808469057, 2.49600411e-08, 0.588538647),
 }
+
 local signalcreator = require(game:GetService("ReplicatedStorage")["devv-framework"].datum).load
 local FireRemoteEvent = signalcreator("Signal")
 
--- FireRemoteEvent.FireServer("event name",args)
 
 
 
@@ -47,7 +47,7 @@ end
 Player_Tab:CreateSection("Health")
 local godmode = false
 Player_Tab:CreateToggle({
-    Name = "Godmode [Testing]",
+    Name = "Godmode",
     Callback = function()
         if godmode == false then
             godmode = true
@@ -64,7 +64,43 @@ game:GetService("RunService").Heartbeat:Connect(function()
 end)
 
 
+
 Player_Tab:CreateSection("Other")
+local fly_Enabled = false
+local fly_Pos = nil
+Player_Tab:CreateToggle({
+    Name = "Fly (Testing)",
+    Callback = function()
+        if fly_Enabled == false then
+            fly_Enabled = true
+            fly_Pos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        else
+            fly_Enabled = false
+            fly_Pos = nil
+        end
+    end
+})
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(fly_Pos,game.Workspace.Camera.CFrame.Position + game.Workspace.Camera.CFrame.LookVector * 30)
+    local UIP = game:GetService("UserInputService")
+    if UIP:IsKeyDown(Enum.KeyCode.W) == true then
+        fly_Pos = fly_Pos + game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.LookVector
+    end
+    
+    if UIP:IsKeyDown(Enum.KeyCode.A) == true then
+         fly_Pos = fly_Pos + -game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.RightVector
+    end
+    
+    if UIP:IsKeyDown(Enum.KeyCode.S) == true then
+        fly_Pos = fly_Pos + -game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.LookVector
+    end
+    
+    if UIP:IsKeyDown(Enum.KeyCode.D) == true then
+        fly_Pos = fly_Pos + game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame.RightVector
+    end
+end)
+
 Player_Tab:CreateToggle({
     Name = "Speed changer (CFrame)",
     Callback = function()
@@ -78,7 +114,7 @@ Player_Tab:CreateToggle({
 
 Player_Tab:CreateSlider{
     Name = "Speed amount",
-    Range = {0, 30},
+    Range = {0, 100},
     Increment = 1,
     Suffix = "Speed",
     CurrentValue = 5,
@@ -90,8 +126,38 @@ local oldposbuyweapon = nil
 local KillAuraDamage = false
 local KillAuraInstant = false
 local StompAura = false
+local ATMAura = false
+local ATMauradistant = 5
 local killauraDistant = 5
 local StomptAuraDistant = 5
+local fistinstakill = false
+Weapons_Tab:CreateSection("Melee")
+
+local old
+old = hookfunction(require(game.ReplicatedStorage["devv-framework"].client.Objects.v3item.modules.melee).meleeHitreg,function(...) 
+    local args = {...}
+    
+    if args[1] ~= "megapunch" then
+        if fistinstakill == true then
+            return old("megapunch")
+        end
+    end
+    
+    return old(...)
+end)
+
+Weapons_Tab:CreateToggle({
+    Name = "One punch Fist",
+    Callback = function()
+        if fistinstakill == false then
+            fistinstakill = true
+        else
+            fistinstakill = false
+        end
+    end
+})
+
+
 Weapons_Tab:CreateSection("Kill aura")
 Weapons_Tab:CreateToggle({
     Name = "Kill aura Instant (Equip fist)",
@@ -116,6 +182,17 @@ Weapons_Tab:CreateToggle({
 })
 
 Weapons_Tab:CreateToggle({
+    Name = "ATM hit aura (equip fist)",
+    Callback = function()
+        if ATMAura == false then
+            ATMAura = true
+        else
+            ATMAura = false
+        end
+    end
+})
+
+Weapons_Tab:CreateToggle({
     Name = "Stomp aura",
     Callback = function()
         if StompAura == false then
@@ -127,12 +204,26 @@ Weapons_Tab:CreateToggle({
 })
 
 game:GetService("RunService").Heartbeat:Connect(function()
+    if ATMAura == true then
+        for i,v in pairs(game:GetService("Workspace").Game.Props.ATM:GetChildren()) do
+            if v:FindFirstChild("Slot") then
+                if (v.Slot.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < ATMauradistant then
+                    if v:GetAttribute("guid") then
+                        FireRemoteEvent.FireServer("meleeHit","prop",{["meleeType"] = "punch",["guid"] = v:GetAttribute("guid")})
+                    end
+                end
+            end
+        end
+    end
+end)
+
+game:GetService("RunService").Heartbeat:Connect(function()
     if StompAura == true then
         for i,v in pairs(game.Players:GetChildren()) do
             if v ~= game.Players.LocalPlayer then
                 if v.Character then
                     if v.Character:FindFirstChild("HumanoidRootPart") then
-                        if (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < StomptAuraDistant then
+                        if (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < StomptAuraDistant then 
                             FireRemoteEvent.FireServer("stompPlayer",v)
                         end
                     end
@@ -141,10 +232,6 @@ game:GetService("RunService").Heartbeat:Connect(function()
         end
     end
 end)
-
-
-
-
 
 game:GetService("RunService").Heartbeat:Connect(function()
     if KillAuraInstant == true then
@@ -168,7 +255,7 @@ game:GetService("RunService").Heartbeat:Connect(function()
             if v ~= game.Players.LocalPlayer then
                 if v.Character then
                     if v.Character:FindFirstChild("HumanoidRootPart") then
-                        if (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude < killauraDistant then
+                        if (v.Character.HumanoidRootPart.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <  killauraDistant  then 
                             FireRemoteEvent.FireServer("meleeHit","player",{["meleeType"] = "punch",["hitPlayerId"] = v.UserId})
                         end
                     end
@@ -197,6 +284,27 @@ Weapons_Tab:CreateSlider({
     CurrentValue = 5,
     Callback = function(num)
         StomptAuraDistant = num
+    end
+})
+
+Weapons_Tab:CreateSlider({
+    Name = "ATM aura distance (studs)",
+    Range = {2, 15},
+    Increment = 1,
+    Suffix = "Distance",
+    CurrentValue = 5,
+    Callback = function(num)
+        ATMauradistant = num
+    end
+})
+
+
+local firsttimetoggle = true
+local onehitpunch = false
+Weapons_Tab:CreateToggle({
+    Name = "One hit punch (synapse x)",
+    Callback = function()
+        
     end
 })
 Weapons_Tab:CreateSection("Buy Loot")
@@ -413,6 +521,7 @@ Misc_Tab:CreateButton({
         end)
     end
 })
+
 
 Esp_Tab:CreateButton({
     Name = "Load unamed esp",
